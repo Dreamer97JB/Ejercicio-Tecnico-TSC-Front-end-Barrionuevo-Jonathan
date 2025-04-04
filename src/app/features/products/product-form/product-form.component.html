@@ -1,0 +1,64 @@
+<form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+
+  <div class="form-title-bar">
+    <h2>{{ isEditMode ? 'Edición de Producto' : 'Formulario de Registro' }}</h2>
+  </div>
+
+  <div *ngFor="let field of ['id', 'name', 'description', 'logo', 'date_release', 'date_revision']" class="form-field">
+  <label [for]="field">{{ fieldLabels[field] }}</label>
+
+  <ng-container [ngSwitch]="field">
+    <input
+      *ngSwitchCase="'date_revision'"
+      type="date"
+      [formControlName]="field"
+      [id]="field"
+      [disabled]="true"
+    />
+
+    <input
+      *ngSwitchDefault
+      [type]="field.includes('date') ? 'date' : 'text'"
+      [formControlName]="field"
+      [id]="field"
+      [attr.placeholder]="fieldplaceholderLabels[field]"
+      [attr.maxLength]="fieldMaxLengths[field]"
+      (keydown)="preventUnsafeChars($event, field)"
+    />
+  </ng-container>
+
+  <div *ngIf="productForm.get(field)?.invalid && (productForm.get(field)?.touched || productForm.get(field)?.dirty)">
+
+    <small *ngIf="productForm.get(field)?.errors?.['required']">Este campo es requerido.</small>
+    <small *ngIf="productForm.get(field)?.errors?.['minlength']">
+      Mínimo {{ productForm.get(field)?.errors?.['minlength'].requiredLength }} caracteres.
+    </small>
+    <small *ngIf="productForm.get(field)?.errors?.['maxlength']">
+      Máximo {{ productForm.get(field)?.errors?.['maxlength'].requiredLength }} caracteres.
+    </small>
+    <small *ngIf="productForm.get(field)?.errors?.['minDate']">La fecha debe ser igual o mayor a la fecha actual .</small>
+    <small *ngIf="productForm.get(field)?.errors?.['notOneYearAfter']">
+      La fecha debe ser exactamente un año después de la fecha de liberación.
+    </small>
+    <small *ngIf="productForm.get(field)?.errors?.['idTaken']">Este ID ya está en uso.</small>
+    <small *ngIf="productForm.get(field)?.errors?.['unsafeChars']">
+      Este campo contiene caracteres no permitidos.
+    </small>
+  </div>
+</div>
+
+
+
+
+  <div class="button-row">
+  <button type="button" (click)="onReset()">
+    {{ isEditMode ? 'Cancelar' : 'Reiniciar' }}
+  </button>
+
+  <button type="submit" [disabled]="productForm.invalid">
+    {{ isEditMode ? 'Guardar' : 'Agregar' }}
+  </button>
+</div>
+
+</form>
+

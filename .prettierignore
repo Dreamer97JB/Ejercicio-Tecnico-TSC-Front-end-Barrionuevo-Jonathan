@@ -1,0 +1,27 @@
+# Ignore build outputs
+/dist
+/out-tsc
+/.angular
+/.next
+/.cache
+
+# Ignore dependencies
+/node_modules
+
+# Ignore environment files (optional)
+src/environments/*
+
+# Ignore Angular config files (optional, if you don't want them auto-formatted)
+angular.json
+package-lock.json
+
+# Ignore test coverage output
+/coverage
+
+# Ignore compiled TypeScript
+*.js
+*.d.ts
+
+# Ignore IDE/editor files
+.vscode
+.idea
