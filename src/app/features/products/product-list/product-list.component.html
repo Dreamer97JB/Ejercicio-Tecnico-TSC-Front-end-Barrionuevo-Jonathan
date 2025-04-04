@@ -1,0 +1,135 @@
+<div class="list-container">
+  <div class="header-bar">
+    <input
+      type="text"
+      [(ngModel)]="filterTerm"
+      (input)="onSearchChange()"
+      (keydown)="preventUnsafeChars($event)"
+      placeholder="Buscar Productos Financieros..."
+      class="search-input"
+    />
+    <button routerLink="/add" class="add-button">Agregar</button>
+  </div>
+
+  <div *ngIf="loading" class="skeleton-table">
+    <div class="skeleton-row" *ngFor="let i of [1,2,3,4,5]">
+      <div class="skeleton-cell skeleton-img"></div>
+      <div class="skeleton-cell skeleton-text"></div>
+      <div class="skeleton-cell skeleton-text"></div>
+      <div class="skeleton-cell skeleton-date"></div>
+      <div class="skeleton-cell skeleton-date"></div>
+      <div class="skeleton-cell skeleton-menu"></div>
+    </div>
+  </div>
+
+  <table
+    *ngIf="!loading && filteredProducts.length > 0"
+    class="product-table"
+  >
+    <thead>
+      <tr>
+        <th>Logo</th>
+        <th>
+          <div class="header-item">
+            Nombre del producto
+          </div>
+        </th>
+         <th>
+          <div class="header-item">
+            Descripción <span class="material-symbols-outlined info-circle">info</span>
+          </div>
+        </th>
+        <th>
+          <div class="header-item">
+            Fecha de liberación <span class="material-symbols-outlined info-circle">info</span>
+          </div>
+        </th>
+        <th>
+          <div class="header-item">
+            Fecha de reestructuración <span class="material-symbols-outlined info-circle">info</span>
+          </div>
+        </th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let product of paginatedProducts">
+        <td>
+          <img [src]="product.logo" alt="Logo" class="product-logo" />
+        </td>
+        <td>{{ product.name }}</td>
+        <td>{{ product.description }}</td>
+        <td>{{ product.date_release | date:'dd-MM-yyyy' }}</td>
+        <td>{{ product.date_revision | date:'dd-MM-yyyy'}}</td>
+        <td class="menu-wrapper">
+          <button (click)="toggleMenu(product.id)" class="menu-button">
+            ⋮
+          </button>
+          <div *ngIf="isMenuOpen(product.id)" class="contextual-menu">
+            <button (click)="onEdit(product.id)">
+              <span class="material-symbols-outlined">edit</span> Editar
+            </button>
+            <button (click)="onDelete(product.id, product.name)">
+              <span class="material-symbols-outlined">delete</span> Eliminar
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Barra inferior unificada (resultados, paginación y selector de página) -->
+  <div
+    class="bottom-bar"
+    *ngIf="!loading && filteredProducts.length > 0"
+  >
+    <div class="results-count">
+      {{ filteredProducts.length }} Resultados
+    </div>
+
+    <!-- <div
+      class="pagination-wrapper"
+      *ngIf="totalResults > pageSize"
+    >
+      <button
+        (click)="currentPage = currentPage - 1"
+        [disabled]="currentPage === 1"
+        class="pagination-icon"
+      >
+        ‹
+      </button>
+      <span>Página {{ currentPage }}</span>
+      <button
+        (click)="currentPage = currentPage + 1"
+        [disabled]="(currentPage * pageSize) >= totalResults"
+        class="pagination-icon"
+      >
+        ›
+      </button>
+    </div> -->
+
+    <div class="page-size-selector">
+      <select
+        [(ngModel)]="pageSize"
+        (change)="onPageSizeChange()"
+      >
+        <option [value]="5">5</option>
+        <option [value]="10">10</option>
+        <option [value]="20">20</option>
+      </select>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && filteredProducts.length === 0" class="no-products-message">
+    <p>No hay productos disponibles.</p>
+  </div>
+
+  <app-confirm-delete-modal
+    *ngIf="showDeleteModal"
+    [visible]="true"
+    [productName]="selectedProductName"
+    (confirm)="confirmDelete()"
+    (cancelDelete)="cancelDelete()"
+  ></app-confirm-delete-modal>
+</div>
